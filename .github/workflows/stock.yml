@@ -1,0 +1,26 @@
+name: 주가 확인
+
+# 모바일에서도 GitHub 앱/웹의 "Run workflow" 버튼으로 바로 실행할 수 있습니다.
+on:
+  workflow_dispatch:        # 수동 실행 (버튼)
+  schedule:
+    - cron: "0 6 * * 1-5"   # 평일 매일 06:00 UTC (= 한국시간 15:00, 장 마감 무렵)
+
+jobs:
+  quote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 시세 조회 및 결과 출력
+        run: |
+          echo "## 📈 한국 반도체 3종목 시세" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          python main.py >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
